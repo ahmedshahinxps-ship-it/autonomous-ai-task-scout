@@ -38,3 +38,19 @@ python worker.py --input examples/sample_products.csv --output output/work_sampl
 ```
 
 No secrets or bank details are required or stored. The public repository contains only demonstration data and program code.
+
+
+## v0.4 status — October 31, 2026
+
+[Latest successful workflow run](https://github.com/ahmedshahinxps-ship-it/autonomous-ai-task-scout/actions/runs/41194885040)
+
+- Source-aware, freshness-aware rankings implemented. Important: the feed publication date is **not** proof the underlying GitHub issue is recent.
+- 26 automated tests passed.
+- 320 listings scanned; 150 ranked entries retained for further review.
+- 6 narrow GitHub issues vetted against their original issue metadata; **0** passed the basic checks.
+- No verified platform-specific right to submit AI-generated work and no confirmed Egypt-compatible payout for a specific task.
+- **Revenue earned: $0.** No work has been submitted to a customer.
+- Further engineering should be prioritised **only** after finding a suitable funded task, rather than optimising hypothetical task completion.
+
+The GitHub workflow continues its read-only daily scan; it cannot independently guarantee new opportunities or future acceptance. Human authorisation/verification may still be necessary for a payment platform.
+
