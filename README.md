@@ -1,35 +1,40 @@
-# Autonomous AI Task Scout — v0.1
+# Autonomous AI Task Scout — v0.2
 
-**Current status: read-only automated discovery, not a revenue-producing agent.** The scanner never claims tasks, submits bids, executes instructions from listings, or interacts with payment accounts.
+**Live deployment:** Automated read-only bounty discovery and preliminary GitHub issue verification. **No paid work has been submitted, accepted, or paid.**
 
-## What is deployed
+## Automated workflow
 
-- `scout.py` scans the public Jobbi gigs JSON feed and selects USD agent-lane leads above $20.
-- `tests/test_scout.py` tests filters, safety, expiration, and disabled submissions.
-- `.github/workflows/task-scout.yml` runs the tests and scout daily at **07:17 UTC**, and supports manual runs.
-- Successful live scans upload `daily-opportunity-report` with `index.html` and `opportunities.json` to the **Actions → run → Artifacts** section.
+The [GitHub Actions workflow](https://github.com/ahmedshahinxps-ship-it/autonomous-ai-task-scout/actions) runs each day at **07:17 UTC**, on relevant code pushes, and via optional manual dispatch. Your laptop does not have to remain on.
 
-To test immediately, open **Actions → Free Read-Only Task Scout → Run workflow**. A scheduled run may be delayed and can be disabled by GitHub after extended inactivity.
+1. **Discovery:** `scout.py` reads Jobbi's JSON feed and ranks USD agent-lane bounty listings.
+2. **Vetting:** `vet.py` examines up to 12 narrowly scoped documentation, data, or testing GitHub issues per scan. It checks public GitHub metadata for open/closed, locked, assignees, high comment volume, issue age and activity. The public API is rate-limited, and checks may remain unverified if GitHub is unavailable.
+3. **Quality:** `python -m unittest discover -s tests -v` runs offline security and filter tests.
+4. **Reporting:** The successful workflow attaches a ZIP containing `index.html`, `opportunities.json`, `vetting.html`, and `vetting.json`.
 
-The public JSON feed may change or be temporarily unavailable. In that case the run will fail rather than present fictional tasks as real. The scanner uses Python's standard library and no paid API. No guarantees of free usage forever.
+**First v0.2 run (October 31, 2026):** 10 candidate GitHub issues checked, zero passed basic checks. These figures do not reflect guaranteed opportunities.
 
-## Payment preferences
+## Important constraints
 
-1. Your own QNB Egypt USD account where a platform supports reasonable USD payout fees.
-2. Your own QNB or NBE Egypt EGP account.
-3. Trusted Saudi contact only as a platform-permitted backup.
+- No task claims, submissions, proposals, messages or payments occur.
+- A **preliminary-review** result means only that a GitHub issue appears open and recent. It does **not** establish permission for AI-generated work, confirmed escrow, acceptance or compatibility with Egyptian payout accounts.
+- The ranking is heuristic, not a probability of earning money.
+- Incoming listing content is treated as untrusted data. No task instructions are executed.
+- The public repository must not contain banking details, personal credentials, or API keys.
 
-**No eligible payer, payout, or automatic task acceptance has been verified by this prototype.** Keep all bank details and credentials out of the public repository.
+## Payment preference (not configured or verified)
 
-## Next phases (not yet deployed)
+1. Personal QNB Egypt USD account, if a marketplace supports direct, economical USD settlement.
+2. Personal QNB/NBE EGP account.
+3. Saudi contact only as a platform-permitted fallback.
 
-Verify funded bounties, AI participation permissions, Egyptian payout eligibility and objective acceptance conditions; sandbox an agent to test code/data tasks; only then consider auto-submission on explicitly compatible platforms.
+## Remaining work
 
-Run locally:
+Find credible fresh funded opportunities; verify automation rules and country-specific payout eligibility; then build task-specific execution and independent tests. Automatic paid submissions should not be enabled until these have been demonstrated.
+
+## Local commands
 
 ```bash
 python -m unittest discover -s tests -v
 python scout.py --output output
+python vet.py --input output/opportunities.json --output output --max-checks 12
 ```
-
-The reports contain unverified opportunity leads, not earnings. Fit scores are simple keyword-based rankings, not probabilities of acceptance.
