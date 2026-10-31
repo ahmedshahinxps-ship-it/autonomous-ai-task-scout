@@ -6,6 +6,8 @@ on:
     paths:
       - 'scout.py'
       - 'vet.py'
+      - 'worker.py'
+      - 'examples/**'
       - 'tests/**'
       - '.github/workflows/task-scout.yml'
   schedule:
@@ -29,6 +31,8 @@ jobs:
         run: python scout.py --output output
       - name: Vet eligible GitHub issue leads (read-only)
         run: python vet.py --input output/opportunities.json --output output --max-checks 12
+      - name: Execute synthetic product-catalogue task (no buyer submission)
+        run: python worker.py --input examples/sample_products.csv --output output/work_sample
       - name: Upload report artifact
         if: success()
         uses: actions/upload-artifact@v7
