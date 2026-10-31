@@ -13,6 +13,7 @@ import zipfile
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from urllib.parse import urlparse
 
 MAX_BYTES = 6_000_000
 
@@ -145,6 +146,8 @@ def main():
             )
             status = "compared" if previous is not None else "baseline"
         except (HTTPError, URLError, TimeoutError, ValueError, OSError, zipfile.BadZipFile, KeyError) as exc:
+            if isinstance(exc, HTTPError):
+                print("Prior report HTTP", exc.code, "host", urlparse(exc.url).hostname)
             status = "unavailable"
             print("Prior artifact unavailable (" + type(exc).__name__ + "), no false new leads reported.")
     result = compare(current, previous, run, status)
