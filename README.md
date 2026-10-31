@@ -54,3 +54,14 @@ No secrets or bank details are required or stored. The public repository contain
 
 The GitHub workflow continues its read-only daily scan; it cannot independently guarantee new opportunities or future acceptance. Human authorisation/verification may still be necessary for a payment platform.
 
+
+
+## v0.5 — three daily scans and change detection (October 31, 2026)
+
+- Scheduled GitHub Actions scans now run at **07:17, 13:17, 19:17 UTC** every day (roughly 09:17, 15:17, 21:17 in Egypt during standard time). Actual run starts may be delayed by GitHub; DST shifts the local clock by an hour.
+- `track.py` compares the current *shortlist* with the most recent prior report artifact and writes `new_leads.json` / `new_leads.html`. A listing counted as **newly shortlisted** is **not necessarily newly posted** or funded; the count is not revenue.
+- Previous-artifact comparisons use GitHub Actions read permission; a cross-host artifact redirect is handled without sending GitHub bearer tokens to the download host.
+- [Verified successful comparison run](https://github.com/ahmedshahinxps-ship-it/autonomous-ai-task-scout/actions/runs/41196473042): **0 new entries** compared with the prior shortlist. The job's automated tests and processing steps all passed.
+- Separately, a ChatGPT recurring condition watch is configured after each scan to notify about new actionable leads or repeated workflow failures; silence means no meaningful change was reported, **not** that a payment occurred.
+
+The project remains a **read-only prototype**, not an autonomous paid job submission business. It does not claim work, send proposals, perform buyer jobs or withdraw money.
