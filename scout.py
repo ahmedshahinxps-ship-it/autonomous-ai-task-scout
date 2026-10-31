@@ -17,6 +17,8 @@ TERMS = {
  "simple_code": ("small bug", "bug fix", "python", "refactor"),
 }
 RISK = ("wallet", "smart contract", "security exploit", "hardware", "staking")
+COMPLEX_TITLES = ("integration", "dashboard", "kubernetes", "oauth", "anti-cheat", "security", "deployment", "architecture", "refactor", "migrate", "full-stack")
+TRUSTED_CASH_SOURCES = ("algora", "bountyhub")
 
 def load_items(payload):
     if isinstance(payload, dict) and isinstance(payload.get("items"), list):
@@ -65,6 +67,19 @@ def inspect(item, min_reward=20, now=None):
     hits = scores[category]
     if not hits: category="other"
     risky = any(term in corpus for term in RISK)
+    source = str(meta.get("source") or "unknown").lower()[:80]
+    published = str(item.get("date_published") or "")
+    age_days = None
+    if published:
+        try:
+            pub = dt.datetime.fromisoformat(published.replace("Z","+00:00"))
+            if pub.tzinfo is None: pub = pub.replace(tzinfo=dt.timezone.utc)
+            age_days = max(0, ((now or dt.datetime.now(dt.timezone.utc)) - pub).days)
+        except ValueError:
+            pass
+    title_lower = title.lower()
+    title_hits = sum(term in title_lower for group in TERMS.values() for term in group)
+    title_complex = any(term in title_lower for term in COMPLEX_TITLES)
     state = str(meta.get("payment_state") or "unknown").lower()
     acceptance = str(meta.get("acceptance_type") or "unknown").lower()
     score = min(50, hits*12) + (10 if state=="escrowed" else -8)
@@ -72,7 +87,17 @@ def inspect(item, min_reward=20, now=None):
     score += 8 if "machine" in acceptance or "automatic" in acceptance else 0
     score -= 30 if risky else 0
     score -= 20 if category=="other" else 0
-    return {"title":title,"url":url,"source":str(meta.get("source") or "unknown")[:80],
+    score += min(28, title_hits * 14)
+    score += 18 if source in TRUSTED_CASH_SOURCES else 0
+    score -= 18 if source == "issuehunt" else 0
+    score -= 28 if title_complex else 0
+    if age_days is not None:
+        score += 22 if age_days <= 14 else 10 if age_days <= 60 else -12 if age_days > 365 else 0
+    # These weights identify leads to investigate, never prove funding or payout.
+    return {"title":title,"url":url,"source":source,
+      "published":published, "age_days":age_days,
+      "payment_rail":str(reward.get("rail") or "unknown")[:40],
+      "payout_grade":str(meta.get("payout_grade") or "unknown")[:8],
       "reward_usd":amount,"category":category,"score":max(0,min(100,score)),
       "payment_state":state,"acceptance_type":acceptance,"risk_flag":risky,
       "automated_submission_permitted":"NOT VERIFIED","egypt_payout":"NOT VERIFIED"}
@@ -84,12 +109,12 @@ def report(items, min_reward=20):
       "feed":FEED,"scanned":len(items),"candidate_count":len(candidates),
       "submissions_enabled":False,"payments_enabled":False,
       "notice":"Unverified leads, not accepted jobs or guaranteed earnings.",
-      "candidates":candidates[:75]}
+      "candidates":candidates[:150]}
 
 def html_report(data,demo=False):
     e=lambda s:html.escape(str(s),quote=True)
     cards=[]
-    for x in data["candidates"]:
+    for x in data["candidates"][:75]:
         search=e((x["title"]+" "+x["category"]+" "+x["source"]).lower())
         cards.append('<article class="card" data-search="'+search+'"><div class="row"><span>'+
           e(x["category"])+'</span><b>$'+format(x["reward_usd"],",.2f")+'</b></div><h3>'+
