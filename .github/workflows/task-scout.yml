@@ -1,6 +1,13 @@
 name: Free Read-Only Task Scout
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scout.py'
+      - 'vet.py'
+      - 'tests/**'
+      - '.github/workflows/task-scout.yml'
   schedule:
     - cron: '17 7 * * *'
 permissions:
@@ -20,6 +27,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Read-only live discovery
         run: python scout.py --output output
+      - name: Vet eligible GitHub issue leads (read-only)
+        run: python vet.py --input output/opportunities.json --output output --max-checks 12
       - name: Upload report artifact
         if: success()
         uses: actions/upload-artifact@v7
