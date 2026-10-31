@@ -1,0 +1,9 @@
+SKU,Product Name,Price
+A101,Electric Kettle,$19.99
+A101, Electric   Kettle ,19.99
+B202,Water Filter,29.50
+C303,Coffee Machine,-12.00
+,Missing Code,4.50
+D404,Immersion Blender,35
+B202,Water Filter,40.00
+E505,=HYPERLINK("http://example.test"),20.00
