@@ -12,10 +12,22 @@ import os
 import zipfile
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
 from urllib.parse import urlparse
 
 MAX_BYTES = 6_000_000
+
+class SafeArtifactRedirect(HTTPRedirectHandler):
+    """Never forward GitHub bearer credentials to Azure blob download hosts."""
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        new_request = super().redirect_request(request, fp, code, msg, headers, newurl)
+        if new_request is not None and urlparse(newurl).hostname != "api.github.com":
+            for dictionary in (new_request.headers, new_request.unredirected_hdrs):
+                for key in list(dictionary):
+                    if key.lower() == "authorization":
+                        del dictionary[key]
+        return new_request
+
 
 def fetch_json(url, token):
     req = Request(url, headers={
@@ -48,7 +60,7 @@ def prior_report(repository, token, current_run):
             "Accept": "application/vnd.github+json",
             "User-Agent": "AutonomousTaskScout/0.5",
         })
-        with urlopen(req, timeout=25) as response:
+        with build_opener(SafeArtifactRedirect()).open(req, timeout=25) as response:
             raw = response.read(MAX_BYTES + 1)
         if len(raw) > MAX_BYTES:
             raise ValueError("Artifact ZIP over limit")
