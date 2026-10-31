@@ -82,17 +82,17 @@ def inspect(item, min_reward=20, now=None):
     title_complex = any(term in title_lower for term in COMPLEX_TITLES)
     state = str(meta.get("payment_state") or "unknown").lower()
     acceptance = str(meta.get("acceptance_type") or "unknown").lower()
-    score = min(50, hits*12) + (10 if state=="escrowed" else -8)
+    score = min(25, hits*7) + (10 if state=="escrowed" else -8)
     score += 8 if category in ("documentation","data","testing") else 0
     score += 8 if "machine" in acceptance or "automatic" in acceptance else 0
     score -= 30 if risky else 0
     score -= 20 if category=="other" else 0
-    score += min(28, title_hits * 14)
-    score += 18 if source in TRUSTED_CASH_SOURCES else 0
-    score -= 18 if source == "issuehunt" else 0
+    score += min(16, title_hits * 8)
+    score += 10 if source in TRUSTED_CASH_SOURCES else 0
+    score -= 15 if source == "issuehunt" else 0
     score -= 28 if title_complex else 0
     if age_days is not None:
-        score += 22 if age_days <= 14 else 10 if age_days <= 60 else -12 if age_days > 365 else 0
+        score += 14 if age_days <= 14 else 7 if age_days <= 60 else -18 if age_days > 365 else 0
     # These weights identify leads to investigate, never prove funding or payout.
     return {"title":title,"url":url,"source":source,
       "published":published, "age_days":age_days,
